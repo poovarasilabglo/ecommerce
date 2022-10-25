@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container ">
+<h1 style = "color:blue">Products List</h1>
+<form action="{% url 'read' %}" method="get">
+  <input type="search" name="query" placeholder="Search by products..." >
+</form>
+<div class="card-columns" style="padding: 10px; margin: 20px;">
+{% for x in object_list %}
+    <div class="card" style="width: 18rem; border:3px ">
+        <img class="card-img-top" src="{{x.img.url}}" alt="{{x.name}}" width =50px height = 50px>
+      
+
+        <div class="card-body">
+        <h4 class="card-title">Name : {{x.name_of_product}}</h4>
+        <p class="card-text">Price : {{x.price}}</p>
+        <p class="card-text">Brand : {{x.brand}}</p>
+        <p class="card-text">Stock : {{x.in_stock}}</p>
+        
+        {% if request.user.is_authenticated %}
+            {% if x.in_stock == True %}
+                <button style = "background-color:green"> <a href = "/addcart/{{x.id}}">ADD TO CARD</a></button>
+             {% endif %}
+        {% endif %}
+        
+        
+        <br><br>
+        </div>
+        </a>
+    </div>
+ {% endfor %}
+ 
+</div>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

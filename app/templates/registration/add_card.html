@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card" style="width: 18rem; border:3px ">   
+{% for x in cart_obj %}
+    <img class="card-img-top" src="{{cart_obj.img.url}}" alt="{{object.name}}" width =50px height = 50px>
+    <div class="card-body">
+    <h5 class="card-title">Name : {{cart_obj.name_of_product}}</h5>
+    <p class="card-text">Price : {{cart_obj.price}}</p>
+    <form method = "GET" action = "qua/{{cart_obj.id}}">
+        <p>quantity<input type = "number" name = "quantity" value = "{{cart_obj.quantity}}"</p>
+        <button type = "submit" >ADD</button>
+        </form>
+{% endfor %}
+{% endblock %}
