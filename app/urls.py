@@ -13,6 +13,9 @@ urlpatterns = [
            path('qua/<int:id>',views.Add_qua,name = 'qua'),
            path('cartlist/',views.show_cart,name = 'cartlist'),
            path('remove/<int:id>',views.Remove_cart,name = 'remove'),
+           path('order/',views.order_view,name = 'order'),
+           path('order_remove/<int:id>',views.Remove_order,name = 'order_remove'),
+        
            
            
     

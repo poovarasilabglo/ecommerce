@@ -24,14 +24,19 @@ class Cart(models.Model):
     quantity = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add = True,null = True)
     price = models.FloatField(default=0)
-    
+    is_active = models.BooleanField(default = False)
     def __str__(self):
         return '{} {}'.format(self.products,self.user)
         
+        
+    def get_total_products_price(self):
+        return self.quantity * self.price 
+          
         
 class order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product_name = models.ManyToManyField(Cart)
     tax = models.FloatField()
-    subtotal = models.PositiveIntegerField()
+    status = models.BooleanField(default = False)
     
+   

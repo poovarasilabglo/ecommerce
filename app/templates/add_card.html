@@ -2,7 +2,7 @@
 
 <div class="card" style="width: 18rem; border:3px ">   
 {% for x in cart_obj %}
-    <img class="card-img-top" src="{{x.img.url}}" alt="{{x.name_of_product}}" width =50px height = 50px>
+    <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =50px height = 50px>
     <div class="card-body">
     <h5 class="card-title">Name : {{x.products.name_of_product}}</h5>
     <p class="card-text">Price : {{x.price}}</p>
@@ -11,5 +11,12 @@
         <button type = "submit" >ADD</button>
         </form>
         <a href="/remove/{{x.id}}">Remove</a><br>
+      </div>
 {% endfor %}
-
+</div><br><br>
+<center>
+<form action = "/order/" method = 'POST'>
+ {% csrf_token %}
+<button type = "submit">checkout</button>
+</form>
+</center>

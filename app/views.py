@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect,HttpResponse
+from django.core.exceptions import ObjectDoesNotExist
+from django.contrib import messages
 from django.urls import reverse
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -65,7 +67,7 @@ def Add_qua(request,id):
 
 # card page listview
 def show_cart(request):
-    cart_obj = Cart.objects.all()
+    cart_obj = Cart.objects.filter(is_active = False)
     return render (request, 'add_card.html', {'cart_obj': cart_obj})
 
 #remove to product in cart
@@ -74,15 +76,34 @@ def Remove_cart(request,id):
     cart_remove.delete()
     return redirect('cartlist')
 
-    
+#order views    
+def order_view(request):
+    if request.method == "POST":
+        orders = Cart.objects.filter(user = request.user).all()
+        orders.update(is_active = True)
+        total = 0
+        for x in orders:
+            quantity = x.quantity
+            price =x.price
+            subtotal =quantity*price
+            total += subtotal
+        context = {
+            'total':total, 
+            'cart':orders
+        }    
+        #print(total)
+        return render(request, 'order_summary.html', context)
+    else:
+        return HttpResponse("your not checkout products")	
+   
+ 
+def Remove_order(request):
+    order_remove = order.objects.get(id = id)
+    order_remove.delete()
+    return redirect('order')
+   
 
-
-
-      
-
-
-
-
+   
 
 
 
