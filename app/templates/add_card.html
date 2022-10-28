@@ -1,5 +1,7 @@
+{% extends 'base.html' %}
 
 
+{% block content %}
 <div class="card" style="width: 18rem; border:3px ">   
 {% for x in cart_obj %}
     <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =50px height = 50px>
@@ -20,3 +22,5 @@
 <button type = "submit">checkout</button>
 </form>
 </center>
+
+{% endblock %}

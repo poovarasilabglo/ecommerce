@@ -38,4 +38,8 @@ class order(models.Model):
     product_name = models.ManyToManyField(Cart)
     status = models.BooleanField(default = False)
     
+class Wishlist(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    product = models.ForeignKey(products, on_delete = models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add = True, null = True)
    

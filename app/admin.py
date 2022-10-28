@@ -3,6 +3,9 @@ from app.models import category
 from app.models import products
 from app.models import Cart
 from app.models import order
+from app.models import Wishlist
+
+
 
 class categoryadmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -23,4 +26,10 @@ admin.site.register(Cart,Cartadmin)
 class orderadmin(admin.ModelAdmin):
     list_display = ('user',)
 
-admin.site.register(order,orderadmin)   
+admin.site.register(order,orderadmin)
+
+
+class Wishlistadmin(admin.ModelAdmin):
+    list_display = ('user',)
+
+admin.site.register(Wishlist,Wishlistadmin)   

@@ -15,7 +15,9 @@ urlpatterns = [
            path('remove/<int:id>',views.Remove_cart,name = 'remove'),
            path('order/',views.order_view,name = 'order'),
            path('order_remove/<int:id>',views.Remove_order,name = 'order_remove'),
-        
+           path('wishlist/<int:id>',views.Add_Wishlist,name = 'wishlist'),
+           path('wish_list/',views.wish_list,name = 'wish_list'),
+           path('remove_wish/<int:id>',views.Remove_wishlist,name = 'remove_wish'),
            
            
     
