@@ -85,7 +85,9 @@ def order_view(request):
         for x in orders:
             quantity = x.quantity
             price =x.price
-            subtotal =quantity*price
+            tax = 10/100
+            subtotal =quantity*price+tax
+            print(subtotal)
             total += subtotal
         context = {
             'total':total, 

@@ -36,7 +36,6 @@ class Cart(models.Model):
 class order(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product_name = models.ManyToManyField(Cart)
-    tax = models.FloatField()
     status = models.BooleanField(default = False)
     
    
