@@ -1,22 +1,23 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.urls import reverse
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
-from django.db.models import Q
-from app.models import *
 from django.views.generic import View,TemplateView
 from django.contrib.auth import login
+from django.contrib import messages
+from django.urls import reverse
+from django.db.models import Q
 from django.db.models import Sum
-
+from app.models import *
 
 
 # login page
 class user_login(View):
     template_name = 'login.html'
     success_url ='/read'    
+
 
 # logout page
 class user_logout(View):
@@ -26,14 +27,14 @@ class user_logout(View):
 
 
 # product create page
-class productscreate(CreateView):
+class products_create(CreateView):
     model = products
     fields = '__all__'
     template_name = 'create.html'
     
     
 # all product view page 
-class productsread(ListView):
+class products_read(LoginRequiredMixin,  ListView):
     model = products
     template_name = 'read.html'
     success_url ='/read'
@@ -48,7 +49,7 @@ class productsread(ListView):
 
 
 # add to cart page
-class Add_Cart(TemplateView):
+class Add_Cart(LoginRequiredMixin,TemplateView):
     template_name = 'mycart.html'
     success_url ='read'
     def get_context_data(self, **kwargs):
@@ -64,7 +65,7 @@ def Add_qua(request,id):
     cart_obj = Cart.objects.get(id = id)
     cart_obj.quantity = request.GET.get('quantity')
     cart_obj.save()
-    return redirect('read')
+    return redirect('cartlist')
 
 
 # card page listview
@@ -84,30 +85,53 @@ def Remove_cart(request,id):
 #order views    
 def order_view(request):
     if request.method == "POST":
-        orders = Cart.objects.filter(user = request.user).all()
+        orders = Cart.objects.filter(Q(user = request.user) & Q(is_active = False))
+        #print(orders)
+        created = order.objects.create(user = request.user) 
+        created.product_name.add(*orders)
         orders.update(is_active = True)
-        total = 0
-        for x in orders:
+        orders_obj = order.objects.filter(user = request.user)
+        total = order.objects.filter(user = request.user).aggregate(Sum('product_name__price'))['product_name__price__sum']
+        tax = total/10
+        print(total)
+        subtotal = total+tax
+        
+        '''for x in orders_obj:
             quantity = x.quantity
             price =x.price
             tax = 10/100
             subtotal =quantity*price+tax
             print(subtotal)
-            total += subtotal
+            total += subtotal'''
         context = {
-            'total':total, 
-            'cart':orders
-        }    
-        #print(total)
+            'total':subtotal, 
+            'orders':orders,
+            'orders_obj':orders_obj
+        }   
         return render(request, 'order_summary.html', context)
     else:
-        return HttpResponse("your not checkout products")	
+        return HttpResponse("your not checkout products")    	
    
- 
-def Remove_order(request,id):
+
+#order history view 
+def order_show(request):
+    if request.method == "GET":
+        orders_obj = order.objects.filter(user = request.user)
+        total = order.objects.filter(user = request.user).aggregate(Sum('product_name__price'))['product_name__price__sum']
+        print(total)
+        context = {
+            'orders_obj':orders_obj,
+            'total':total
+        }
+        return render(request, 'order_summary.html',context)
+    
+    
+
+#delete order
+def cancel_order(request,id):
     order_remove = order.objects.get(id = id)
     order_remove.delete()
-    return redirect('order')
+    return redirect('order_show')
 
 
 #wishlist show page 
@@ -122,12 +146,13 @@ def wish_list(request):
 
 #wishlist add    
 def Add_Wishlist(request,id):
-    product_obj = products.objects.get(id=id)
-    wishlist,created = Wishlist.objects.get_or_create(user=request.user, product=product_obj)
-    if created:
-        messages.info(request,'The item was added to your wishlist')
-    else:
-         messages.info(request,'The item was already in your wishlist')
+    if request.method == "POST":
+        product_obj = products.objects.get(id=id)
+        wishlist,created = Wishlist.objects.get_or_create(user=request.user, product=product_obj)
+        if created:
+            messages.info(request,'The item was added to your wishlist')
+        else:
+            messages.info(request,'The item was already in your wishlist')
     return redirect('read')
 
 
@@ -160,3 +185,4 @@ def Remove_wishlist(request,id):
   
   
  
+       

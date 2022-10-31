@@ -1,13 +1,22 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+class TimeStampedModel(models.Model):
+     created_on = models.DateTimeField(auto_now_add=True,null= True,blank = True)
+     updated_on = models.DateTimeField(auto_now=True,null= True,blank = True)
+     class Meta:
+         abstract = True
+
+
+
 class category(models.Model):
     name = models.CharField(max_length=50)
     
     def __str__(self):
         return self.name
 
-class products(models.Model):  
+class products(TimeStampedModel):  
     Category = models.ForeignKey(category, on_delete=models.CASCADE, null = True)
     name_of_product = models.CharField(max_length=60) 
     price = models.IntegerField(default=0)
@@ -16,13 +25,12 @@ class products(models.Model):
     in_stock = models.BooleanField(default = True)
     
     def __str__(self):
-        return '{} {}'.format(self.name_of_product,self.id)
+        return '{}'.format(self.name_of_product)
     
-class Cart(models.Model):
+class Cart(TimeStampedModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     products = models.ForeignKey(products, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    created_at = models.DateTimeField(auto_now_add = True,null = True)
     price = models.FloatField(default=0)
     is_active = models.BooleanField(default = False)
     def __str__(self):
@@ -33,13 +41,14 @@ class Cart(models.Model):
         return self.quantity * self.price 
           
         
-class order(models.Model):
+class order(TimeStampedModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product_name = models.ManyToManyField(Cart)
     status = models.BooleanField(default = False)
-    
-class Wishlist(models.Model):
+ 
+
+
+class Wishlist(TimeStampedModel):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     product = models.ForeignKey(products, on_delete = models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add = True, null = True)
    

@@ -10,9 +10,12 @@
     <div class="card-body">
     <h5 class="card-title">Name : {{x.product.name_of_product}}</h5>
     <p class="card-text">Price : {{x.product.price}}</p>
+    <p class="card-text">created_at : {{x.created_at}}</p>
     
      <a href="/remove_wish/{{x.id}}">Remove</a><br><br>
-     <button style="background-color:green"><a href="/addcart/{{x.id}}">Cart</a><br></button>
+     
+     
+     <button style="background-color:#10D52A"><a href="/addcart/{{x.id}}">Add To Cart</a><br></button>
       </div>
 {% endfor %}
 </div>
