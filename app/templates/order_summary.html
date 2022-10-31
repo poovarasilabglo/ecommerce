@@ -4,21 +4,20 @@
 <h2 style = "color:blue"> Order Summary</h2>
 <div class="card" style="width: 18rem; border:3px ">   
 
-{% for x in orders_obj %}
-{% for y in x.product_name.all %}
-    <img class="card-img-top" src="{{y.products.img.url}}" alt="{{y.products.name_of_product}}" width =50px height = 50px>
+{% for x in order_obj %}
+    <img class="card-img-top" src="{{x.products.img.url}}" alt="{{y.products.name_of_product}}" width =50px height = 50px>
     <div class="card-body">
-    <h5 class="card-title">Name : {{y.products.name_of_product}}</h5>
-    <p>Quantity : {{y.quantity}}</p>
-    <p class="card-text">Price : {{y.price}}</p>
-    <p>product_price : RS{{y.get_total_products_price}}</p>
+    <h5 class="card-title">Name : {{x.products.name_of_product}}</h5>
+    <p>Quantity : {{x.quantity}}</p>
+    <p class="card-text">Price : {{x.price}}</p>
+    <p>product_price : RS{{x.get_total_products_price}}</p>
     <p>created_at : {{x.created_at}}</p>
     </div>
     <center><a href="/order_remove/{{x.id}}"><button style = "background-color:red">Cancel</button></a><br></center>
 {% endfor %}
-{% endfor %}
+
 </div><br>
-<h4 style = "color:blue">Tax : 10%</h4>
+<h4 style = "color:blue">Tax : {{Tax}}</h4>
 <h3 style = "color:blue">Total amount : {{total}}</h3>
 
 {% endblock %}

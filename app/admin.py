@@ -24,12 +24,12 @@ admin.site.register(Cart,Cartadmin)
 
 
 class orderadmin(admin.ModelAdmin):
-    list_display = ('user','created_on')
+    list_display = ('user','created_at','order_status')
 
 admin.site.register(order,orderadmin)
 
 
 class Wishlistadmin(admin.ModelAdmin):
-    list_display = ('user','created_on')
+    list_display = ('user','created_at')
 
 admin.site.register(Wishlist,Wishlistadmin)   

@@ -8,7 +8,7 @@ from django.views.generic import View,TemplateView
 from django.contrib.auth import login
 from django.contrib import messages
 from django.urls import reverse
-from django.db.models import Q
+from django.db.models import Q,F
 from django.db.models import Sum
 from app.models import *
 
@@ -56,7 +56,7 @@ class Add_Cart(LoginRequiredMixin,TemplateView):
         context = super().get_context_data(**kwargs)
         product_id = self.kwargs['id']
         product_obj = products.objects.get(id=product_id)
-        context['cart_obj'] = Cart.objects.create(user = self.request.user, products = product_obj, price = product_obj.price)
+        context['cart_obj'] = Cart.objects.create(user = self.request.user, products = product_obj, quantity =1, price = product_obj.price)
         return context 
               
 
@@ -85,46 +85,40 @@ def Remove_cart(request,id):
 #order views    
 def order_view(request):
     if request.method == "POST":
-        orders = Cart.objects.filter(Q(user = request.user) & Q(is_active = False))
-        #print(orders)
+        carts = Cart.objects.filter(Q(user = request.user) & Q(is_active = False))
         created = order.objects.create(user = request.user) 
-        created.product_name.add(*orders)
-        orders.update(is_active = True)
-        orders_obj = order.objects.filter(user = request.user)
-        total = order.objects.filter(user = request.user).aggregate(Sum('product_name__price'))['product_name__price__sum']
-        tax = total/10
-        print(total)
-        subtotal = total+tax
-        
-        '''for x in orders_obj:
-            quantity = x.quantity
-            price =x.price
-            tax = 10/100
-            subtotal =quantity*price+tax
-            print(subtotal)
-            total += subtotal'''
+        created.product_name.add(*carts)
+        carts.update(is_active = True)
+        orders_product = order.objects.latest('product_name__id')
+        order_obj = orders_product.product_name.all()
+        total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
+        tax = total * 0.1
+        subtotal = total + tax
         context = {
-            'total':subtotal, 
-            'orders':orders,
-            'orders_obj':orders_obj
-        }   
+            'order_obj':order_obj,
+            'Tax':tax,
+            'total':subtotal
+        }  
         return render(request, 'order_summary.html', context)
     else:
-        return HttpResponse("your not checkout products")    	
-   
+        return HttpResponse("your not checkout products")
+  
 
+   
 #order history view 
 def order_show(request):
     if request.method == "GET":
-        orders_obj = order.objects.filter(user = request.user)
-        total = order.objects.filter(user = request.user).aggregate(Sum('product_name__price'))['product_name__price__sum']
-        print(total)
+        orders_product = order.objects.latest('product_name__id')
+        order_obj = orders_product.product_name.all()
+        total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
+        tax = total * 0.1
+        subtotal = total + tax
         context = {
-            'orders_obj':orders_obj,
-            'total':total
-        }
-        return render(request, 'order_summary.html',context)
-    
+            'order_obj':order_obj,
+            'Tax':tax,
+            'total':subtotal
+        }  
+        return render(request, 'order_summary.html', context)  
     
 
 #delete order
@@ -158,9 +152,10 @@ def Add_Wishlist(request,id):
 
 #wishlist remove 
 def Remove_wishlist(request,id):
-    wish_remove = Wishlist.objects.get(id = id)
-    wish_remove.delete()
-    return redirect('wish_list')
+    if request.method == "POST":
+        wish_remove = Wishlist.objects.get(id = id)
+        wish_remove.delete()
+        return redirect('wish_list')
 
 
 

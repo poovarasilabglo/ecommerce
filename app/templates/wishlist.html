@@ -11,12 +11,13 @@
     <h5 class="card-title">Name : {{x.product.name_of_product}}</h5>
     <p class="card-text">Price : {{x.product.price}}</p>
     <p class="card-text">created_at : {{x.created_at}}</p>
-    
-     <a href="/remove_wish/{{x.id}}">Remove</a><br><br>
+    <button style="background-color:#10D52A"><a href="/addcart/{{x.id}}">Add To Cart</a><br></button>
+      </div><br>
+     <form action = "{% url 'remove_wish' x.id %}" method = 'POST'>
+     {% csrf_token %}
+     <button style = "background-color:red">Remove</button><br><br>
+     </form>
      
-     
-     <button style="background-color:#10D52A"><a href="/addcart/{{x.id}}">Add To Cart</a><br></button>
-      </div>
 {% endfor %}
 </div>
 
