@@ -14,7 +14,7 @@ admin.site.register(category,categoryadmin)
 
 class productsadmin(admin.ModelAdmin):
     list_display = ('id','Category','name_of_product','price','brand','img',)
-
+    search_fields = ('id','category',)
 admin.site.register(products,productsadmin) 
 
 class Cartadmin(admin.ModelAdmin):
@@ -24,7 +24,7 @@ admin.site.register(Cart,Cartadmin)
 
 
 class orderadmin(admin.ModelAdmin):
-    list_display = ('user','created_at','order_status')
+    list_display = ('id','user','created_at','order_status')
 
 admin.site.register(order,orderadmin)
 

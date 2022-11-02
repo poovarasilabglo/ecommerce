@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 style = "color:blue">My Order History</h2>
+<div class="card" style="width: 18rem; border:3px ">   
+{% for x in orders %}
+{% for y in x.product_name.all %}
+    <img class="card-img-top" src="{{y.products.img.url}}" alt="{{y.products.name_of_product}}" width =150px height = 150px>
+    <div class="card-body">
+    <h5 class="card-title">Name : {{y.products.name_of_product}}</h5>
+    <p>Quantity : {{y.quantity}}</p>
+    <p class="card-text">Price : {{y.price}}</p>
+    <p>product_price : RS {{y.get_total_products_price}}</p>
+    <p>created_at : {{x.created_at}}</p>
+    <p>Order Status : {{x.order_status}}</p>
+    </div>
+   
+    </div>
+  {% endfor %}  
+{% endfor %}
+{% endblock %}

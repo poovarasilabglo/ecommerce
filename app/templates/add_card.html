@@ -6,7 +6,7 @@
 <h2 style = "color:blue">card page</h2>
 <div class="card" style="width: 18rem; border:3px ">   
 {% for x in cart_obj %}
-    <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =50px height = 50px>
+    <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
     <h5 class="card-title">Name : {{x.products.name_of_product}}</h5>
     <p class="card-text">Price : {{x.price}}</p>
@@ -15,7 +15,12 @@
         <button type = "submit" >ADD</button>
         <p>Created_at : {{x.created_at}}</p>
         </form>
-        <a href="/remove/{{x.id}}">Remove</a><br>
+        <div>
+        <form method = "POST" action = "/remove/{{x.id}}">
+           {% csrf_token %}
+        <button style = "background-color:red">Remove</button><br>
+        </form>
+        </div>
       </div>
 
 {% endfor %}
@@ -23,7 +28,7 @@
 <center>
 <form action = "{% url 'order' %}" method = 'POST'>
  {% csrf_token %}
-<button type = "submit">checkout</button>
+<button type = "submit"  style = "background-color:green">checkout</button>
 </form>
 </center>
 {% endblock %}

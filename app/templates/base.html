@@ -1,13 +1,15 @@
 
 <div style= padding-left:1000px;>
-<a class="nav-link" href="/read"><i class="fa fa-shopping-cart"></i>Home</a>
-<a class="nav-link" href="/cartlist"><i class="fa fa-shopping-cart"></i>Cart</a>
-<a class="nav-link" href="/wish_list"><i class="fa fa-shopping-cart"></i>Wishlist</a>
-<a class="nav-link" href="/order_show"><i class="fa fa-shopping-cart"></i>Order</a>
-<a class="nav-link" href="{% url 'logout' %}">logout</a>
+<a href = "/read"><img src ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdr9q6UiCLATEAU_WSiVdUxKgENgCarm2g3A&usqp=CAU" alt ="cart" width =50px height =50px></a>
+<a href = "/cartlist"><img src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg7hufVObVWgZPNR86dh_s4JFaY-6IQTCR2w&usqp=CAU" alt = "cart" width =50px height = 50px></a>
+<a href="/wish_list"><img src = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsIgGScQKl1N2E9NxszV65a5NdMGepKpSzvw&usqp=CAU" alt = "wishlist" width =50px height = 50px></a> 
+<a href="/order_show"><img src ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqIjbjTzY4UvnMVCzxCaFoP9-o_x7eJVyoYQ&usqp=CAU" alt ="order" width =50px height = 50px></a>
+<a class="nav-link" href="{% url 'logout' %}"><img src ="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRccmKL9bEgD0XdknmrszXkgMLTJSnzxupZNw&usqp=CAU" alt ="order" width =50px height = 50px></a> 
+<a class="nav-link" href="/myorder"><i class="fa fa-shopping-cart"></i>OrderHistory</a>
 </div>
 {% block content %}
 {% endblock %}
 
 
-
+  
+                    

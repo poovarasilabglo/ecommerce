@@ -6,18 +6,19 @@
 <div class="card" style="width: 18rem; border:3px ">  
 <h2 style = "color:blue">Wishlist</h2> 
 {% for x in wishlist %}
-    <img class="card-img-top" src="{{x.product.img.url}}" alt="{{x.products.name_of_product}}" width =50px height = 50px>
+    <img class="card-img-top" src="{{x.product.img.url}}" alt="{{x.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
     <h5 class="card-title">Name : {{x.product.name_of_product}}</h5>
     <p class="card-text">Price : {{x.product.price}}</p>
     <p class="card-text">created_at : {{x.created_at}}</p>
-    <button style="background-color:#10D52A"><a href="/addcart/{{x.id}}">Add To Cart</a><br></button>
+    <button style="background-color:#10D52A"><a href="/addcart/{{x.product.id}}">Add To Cart</a><br></button>
       </div><br>
+     <div>
      <form action = "{% url 'remove_wish' x.id %}" method = 'POST'>
      {% csrf_token %}
      <button style = "background-color:red">Remove</button><br><br>
      </form>
-     
+     </div>
 {% endfor %}
 </div>
 

@@ -4,11 +4,11 @@ from django.contrib.auth.models import User
 
 SUCCESS = 1
 PENDING = 2
-FAILED = 3
+CANCEL = 3
 ORDER_STATUS_CHOICES = (
         (SUCCESS, 'Success'),
-        (PENDING, 'Pending'),
-        (FAILED, 'Failed')
+        (PENDING, 'Pending order'),
+        (CANCEL, 'cancel order')
 )
 
     
@@ -33,7 +33,7 @@ class products(TimeStampedModel):
     in_stock = models.BooleanField(default = True)
     
     def __str__(self):
-        return '{}'.format(self.name_of_product)
+        return '{} {}'.format(self.name_of_product, self.id)
     
 class Cart(TimeStampedModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
@@ -52,7 +52,8 @@ class Cart(TimeStampedModel):
 class order(TimeStampedModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product_name = models.ManyToManyField(Cart)
-    order_status = models.IntegerField(default= 2,choices = ORDER_STATUS_CHOICES) 
+    order_status = models.IntegerField(default = 2,choices = ORDER_STATUS_CHOICES) 
+    tax =  models.FloatField(default = 0.1)
     status = models.BooleanField(default = False)
  
 

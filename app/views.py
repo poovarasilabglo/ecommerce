@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
+from app.form import RegisterForm
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -17,6 +18,21 @@ from app.models import *
 class user_login(View):
     template_name = 'login.html'
     success_url ='/read'    
+
+
+# Register page
+def register(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            messages.success(request, f'Your account has been created! You are now able to log in {username}')
+            return redirect('accounts/login')
+    else:
+        form = RegisterForm()
+        return render(request, 'register.html', {'form': form})
+
 
 
 # logout page
@@ -44,8 +60,19 @@ class products_read(LoginRequiredMixin,  ListView):
         query = self.request.GET.get('query')
         if query:
             qs = qs.filter( Q(name_of_product__icontains=query) | Q(brand__icontains=query) )
+        print(qs)
         return qs
-  
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        l = []
+        wish = list(Wishlist.objects.filter(user = self.request.user).values('product__id'))
+        for i in wish:
+            for j, k in i.items():
+                l.append(k)
+        print(l)
+        context['wish_product'] =l
+        print(context)
+        return context 
 
 
 # add to cart page
@@ -77,12 +104,14 @@ def show_cart(request):
 
 #remove to product in cart
 def Remove_cart(request,id):
-    cart_remove = Cart.objects.get(id=id)
-    cart_remove.delete()
-    return redirect('cartlist')
+    if request.method == "POST":
+        cart_remove = Cart.objects.get(id=id)
+        cart_remove.delete()
+        return redirect('cartlist')
 
 
-#order views    
+#order views 
+@login_required   
 def order_view(request):
     if request.method == "POST":
         carts = Cart.objects.filter(Q(user = request.user) & Q(is_active = False))
@@ -92,9 +121,10 @@ def order_view(request):
         orders_product = order.objects.latest('product_name__id')
         order_obj = orders_product.product_name.all()
         total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
-        tax = total * 0.1
+        tax = total * orders_product.tax
         subtotal = total + tax
         context = {
+            'orders_product':orders_product,
             'order_obj':order_obj,
             'Tax':tax,
             'total':subtotal
@@ -111,33 +141,31 @@ def order_show(request):
         orders_product = order.objects.latest('product_name__id')
         order_obj = orders_product.product_name.all()
         total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
-        tax = total * 0.1
+        tax = total * orders_product.tax
         subtotal = total + tax
         context = {
+            'orders_product':orders_product,
             'order_obj':order_obj,
             'Tax':tax,
             'total':subtotal
         }  
         return render(request, 'order_summary.html', context)  
     
+    
 
 #delete order
 def cancel_order(request,id):
-    order_remove = order.objects.get(id = id)
-    order_remove.delete()
-    return redirect('order_show')
+    if request.method == "POST":
+        order_remove = order.objects.get(id = id)
+        order_remove.order_status = 3
+        order_remove.save()
+        return redirect('order_show')
 
-
-#wishlist show page 
-@login_required(redirect_field_name='/wish_list', login_url='/accounts/login')  
-def wish_list(request):
-    wishlist = Wishlist.objects.filter(user = request.user)
-    context ={
-        'wishlist':wishlist
-    }
-    return render(request,'wishlist.html',context)
-
-
+def Remove_single_order(request,id):
+    single_remove = Cart.objects.get(id=id)
+    single_remove.delete()
+    return redirect('order')
+    
 #wishlist add    
 def Add_Wishlist(request,id):
     if request.method == "POST":
@@ -150,6 +178,17 @@ def Add_Wishlist(request,id):
     return redirect('read')
 
 
+
+#wishlist show page 
+@login_required(redirect_field_name='/wish_list', login_url='/accounts/login')  
+def wish_list(request):
+    wishlist = Wishlist.objects.filter(user = request.user)
+    context ={
+        'wishlist':wishlist
+    }
+    return render(request,'wishlist.html',context)
+
+
 #wishlist remove 
 def Remove_wishlist(request,id):
     if request.method == "POST":
@@ -158,12 +197,13 @@ def Remove_wishlist(request,id):
         return redirect('wish_list')
 
 
+#total order history
+def My_order(request):
+     orders = order.objects.filter(user = request.user)
+     return render (request, 'my_order.html', {'orders': orders})
 
 
 
-
-
-  
   
   
   

@@ -5,7 +5,8 @@
 <form method = 'POST'>
 {% csrf_token %}
 {{form.as_p}}
-<input type="submit" value="Login">
+<input type="submit" value="Login" style = "background-color:skyblue">
 </form>
+<a href ="{% url 'register' %}"><button style = "background-color:#10D52A">Register</button></a>
 {% endblock %}
     

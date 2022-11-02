@@ -11,15 +11,15 @@
 </ul>
 {% endif %}
 <form action="{% url 'read' %}" method="get">
-  <input type="search" name="query" placeholder="Search by products..." >
+  <input type="search" name="query" placeholder="Search by products..." style = "width: 20%; height: 25px;" >
 </form>
-<div class="card-columns" style="padding: 10px; margin: 20px;">
+<div class="card-columns" style="padding: 10px; margin: 20px; display:flex;">
 {% for x in object_list %}
-    <div class="card" style="width: 18rem; border:3px ">
-        <img class="card-img-top" src="{{x.img.url}}" alt="{{x.name}}" width =50px height = 50px>
+    <div class="card" style="width: 18rem; border:3px;">
+        <img class="card-img-top" src="{{x.img.url}}" alt="{{x.name}}" width =150px height = 150px>
       
 
-        <div class="card-body">
+        <div class="card-body" >
         <h4 class="card-title">Name : {{x.name_of_product}}</h4>
         <p class="card-text">Price : {{x.price}}</p>
         <p class="card-text">Brand : {{x.brand}}</p>
@@ -27,20 +27,20 @@
         
         {% if request.user.is_authenticated %}
             {% if x.in_stock == True %}
-                <button style = "background-color:skyblue"> <a href = "/addcart/{{x.id}}">Add To Card</a></button><br><br>
-                
-             {% endif %}
+                <button style = "background-color:skyblue"> <a href = "/addcart/{{x.id}}">Add To Card</a></button>
+            {% endif %}
         {% endif %}
-        
-        
-        <form action = "/wishlist/{{x.id}}" method="POST">
-        {%csrf_token%}
-        <button style="background-color:#10D52A"> ADD Wishlist</button>
-        </form>
+        {% if x.id  not in wish_product %}
+           <form action = "/wishlist/{{x.id}}" method="POST"><br><br>
+              {%csrf_token%}
+           <button style="background-color:#10D52A"> ADD Wishlist</button>
+            </form>
+           {% else %}
+           <h4>Alredy wish product<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS5oBYRIuhqHFcHUt_qMVSGOHzuqA5gbBafwQ&usqp=CAU" alt ="alreay wish" width =30px height =30px></h4>
+          {% endif %}
         
         </div>
-        
-    </div>
+     </div>
  {% endfor %}
  
 </div>
