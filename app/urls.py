@@ -21,9 +21,11 @@ urlpatterns = [
            path('wishlist/<int:id>',views.Add_Wishlist,name = 'wishlist'),
            path('wish_list/',views.wish_list,name = 'wish_list'),
            path('remove_wish/<int:id>',views.Remove_wishlist,name = 'remove_wish'),
-           path('myorder/',views.My_order,name = 'myorder'),
-       
-           
+           path('myorder/',views.My_order_allhistory,name = 'myorder'),
+           path('js/',productsview_json.as_view(), name='js'),
+           path('order_js/',order_json.as_view(), name='order_js'),
+           path('cart_js/',cart_json.as_view(), name='cart_js'),
+           path('wish_js/',wishlist_json.as_view(), name='wish_js'),
            
     
 

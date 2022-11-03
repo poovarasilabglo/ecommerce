@@ -7,18 +7,32 @@ from app.models import Wishlist
 
 
 
+class InLineCart(admin.TabularInline):
+    model = Cart
+    extra = 1
+    max_num =3
+class InLineWishlist(admin.StackedInline):
+    model = Wishlist
+
+
 class categoryadmin(admin.ModelAdmin):
     list_display = ('name',)
 
 admin.site.register(category,categoryadmin) 
 
 class productsadmin(admin.ModelAdmin):
+    inlines = [InLineWishlist, InLineCart]
     list_display = ('id','Category','name_of_product','price','brand','img',)
-    search_fields = ('id','category',)
+    search_fields = ('id','name_of_product')
+    list_display_links = ('name_of_product','brand')
+    list_editable = ('price',)
+    list_filter = ('name_of_product','price')
 admin.site.register(products,productsadmin) 
 
+
 class Cartadmin(admin.ModelAdmin):
-    list_display = ('user','products','quantity','price',)
+    search_fields = ('products__name_of_product',)
+    list_display = ('user','products','quantity','price','cart_status')
 
 admin.site.register(Cart,Cartadmin)   
 

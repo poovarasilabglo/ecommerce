@@ -12,6 +12,8 @@ from django.urls import reverse
 from django.db.models import Q,F
 from django.db.models import Sum
 from app.models import *
+from django.core import serializers
+#from django.http import JsonResponse
 
 
 # login page
@@ -60,7 +62,7 @@ class products_read(LoginRequiredMixin,  ListView):
         query = self.request.GET.get('query')
         if query:
             qs = qs.filter( Q(name_of_product__icontains=query) | Q(brand__icontains=query) )
-        print(qs)
+        #print(qs)
         return qs
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -69,10 +71,21 @@ class products_read(LoginRequiredMixin,  ListView):
         for i in wish:
             for j, k in i.items():
                 l.append(k)
-        print(l)
+        #print(l)
         context['wish_product'] =l
-        print(context)
+        #print(context)
         return context 
+              
+        
+        
+#productlist display in json format    
+class productsview_json(ListView):
+    model = products  
+    def get(self,request, *args, **kwargs):
+        qs = products.objects.all()
+        qs_json = serializers.serialize('json', qs, indent =4)
+        print(type(qs_json))
+        return HttpResponse(qs_json, content_type='application/json')
 
 
 # add to cart page
@@ -101,6 +114,19 @@ def show_cart(request):
     cart_obj = Cart.objects.filter(is_active = False)
     return render (request, 'add_card.html', {'cart_obj': cart_obj})
 
+
+
+#cartlist display json format
+class cart_json(ListView):
+    model = Cart 
+    def render_to_response(self, context, **kwargs):
+        qs = Cart.objects.filter(is_active = False)
+        #print(qs)
+        qs_json = serializers.serialize('json', qs, indent =4)
+        #print(type(qs_json))
+        return HttpResponse(qs_json, content_type='application/json')
+
+ 
 
 #remove to product in cart
 def Remove_cart(request,id):
@@ -139,7 +165,7 @@ def order_view(request):
 def order_show(request):
     if request.method == "GET":
         orders_product = order.objects.latest('product_name__id')
-        order_obj = orders_product.product_name.all()
+        order_obj = orders_product.product_name.filter(cart_status= 2)
         total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
         tax = total * orders_product.tax
         subtotal = total + tax
@@ -151,9 +177,22 @@ def order_show(request):
         }  
         return render(request, 'order_summary.html', context)  
     
-    
+ 
 
-#delete order
+
+class order_json(ListView):
+    model = order  
+    def get(self,request, *args, **kwargs):
+        orders_product = order.objects.latest('product_name__id')
+        order_obj = orders_product.product_name.filter(cart_status= 2)
+        qs_json = serializers.serialize('json', order_obj, indent =4)
+        print(type(qs_json))
+        return HttpResponse(qs_json, content_type='application/json')
+
+ 
+ 
+    
+#delete all product in orderpage
 def cancel_order(request,id):
     if request.method == "POST":
         order_remove = order.objects.get(id = id)
@@ -163,7 +202,8 @@ def cancel_order(request,id):
 
 def Remove_single_order(request,id):
     single_remove = Cart.objects.get(id=id)
-    single_remove.delete()
+    single_remove.cart_status = 3
+    single_remove.save()
     return redirect('order')
     
 #wishlist add    
@@ -197,8 +237,20 @@ def Remove_wishlist(request,id):
         return redirect('wish_list')
 
 
-#total order history
-def My_order(request):
+#wishlist display json format
+class wishlist_json(ListView):
+    model = Wishlist 
+    def render_to_response(self, context, **kwargs):
+        qs = Wishlist.objects.all()
+        print(qs)
+        qs_json = serializers.serialize('json', qs, indent =4)
+        print(type(qs_json))
+        return HttpResponse(qs_json, content_type='application/json')
+
+ 
+ 
+ #total order history
+def My_order_allhistory(request):
      orders = order.objects.filter(user = request.user)
      return render (request, 'my_order.html', {'orders': orders})
 

@@ -40,6 +40,7 @@ class Cart(TimeStampedModel):
     products = models.ForeignKey(products, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     price = models.FloatField()
+    cart_status = models.IntegerField(default = 2,choices = ORDER_STATUS_CHOICES) 
     is_active = models.BooleanField(default = False)
     def __str__(self):
         return '{} {}'.format(self.products,self.user)

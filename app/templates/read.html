@@ -43,7 +43,15 @@
      </div>
  {% endfor %}
  
-</div>
+</div><br><br>
+<h3 style = "color:blue">json format</h3>
+<form action="{% url 'read' %}" method="get">
+  <input type="search" name="query" placeholder="Search by products..." style = "width: 20%; height: 25px;" >
+</form>
+<a href = "/js"><button>productlist</button></a>
+<a href = "/cart_js"><button>cart</button></a>
+<a href = "/wish_js"><button>wishlist</button></a>
+<a href = "/order_js"><button>ordersummary</button></a>
 {% endblock %}
 
 
