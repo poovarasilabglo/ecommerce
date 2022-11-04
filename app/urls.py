@@ -26,7 +26,7 @@ urlpatterns = [
            path('order_js/',order_json.as_view(), name='order_js'),
            path('cart_js/',cart_json.as_view(), name='cart_js'),
            path('wish_js/',wishlist_json.as_view(), name='wish_js'),
-           
+           path('search_js/',search_product_json.as_view(), name='search_js'),
     
 
     ]

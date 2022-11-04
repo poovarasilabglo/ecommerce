@@ -13,7 +13,7 @@ from django.db.models import Q,F
 from django.db.models import Sum
 from app.models import *
 from django.core import serializers
-#from django.http import JsonResponse
+
 
 
 # login page
@@ -76,7 +76,18 @@ class products_read(LoginRequiredMixin,  ListView):
         #print(context)
         return context 
               
-        
+class search_product_json(ListView):
+    model = products  
+    
+    def render_to_response(self, context, **kwargs):
+        product_qs = products.objects.all()
+        print(product_qs)
+        query = self.request.GET.get('query')
+        print(query)
+        qs = product_qs.filter( Q(name_of_product__icontains=query) | Q(brand__icontains=query) )
+        qs_json = serializers.serialize('json', qs, indent =4)
+        return HttpResponse(qs_json, content_type='application/json')
+   
         
 #productlist display in json format    
 class productsview_json(ListView):
@@ -179,7 +190,7 @@ def order_show(request):
     
  
 
-
+#order page display json
 class order_json(ListView):
     model = order  
     def get(self,request, *args, **kwargs):

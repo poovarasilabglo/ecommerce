@@ -10,7 +10,7 @@
     {% endfor %}
 </ul>
 {% endif %}
-<form action="{% url 'read' %}" method="get">
+<form action="{% url 'read' %}" method="GET">
   <input type="search" name="query" placeholder="Search by products..." style = "width: 20%; height: 25px;" >
 </form>
 <div class="card-columns" style="padding: 10px; margin: 20px; display:flex;">
@@ -45,7 +45,7 @@
  
 </div><br><br>
 <h3 style = "color:blue">json format</h3>
-<form action="{% url 'read' %}" method="get">
+<form action="{% url 'search_js' %}" method="GET">
   <input type="search" name="query" placeholder="Search by products..." style = "width: 20%; height: 25px;" >
 </form>
 <a href = "/js"><button>productlist</button></a>
