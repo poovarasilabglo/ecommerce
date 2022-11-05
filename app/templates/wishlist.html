@@ -8,7 +8,7 @@
 {% for x in wishlist %}
     <img class="card-img-top" src="{{x.product.img.url}}" alt="{{x.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
-    <h5 class="card-title">Name : {{x.product.name_of_product}}</h5>
+    <h4 class="card-title">Name : {{x.product.name_of_product}}</h4>
     <p class="card-text">Price : {{x.product.price}}</p>
     <p class="card-text">created_at : {{x.created_at}}</p>
     <button style="background-color:#10D52A"><a href="/addcart/{{x.product.id}}">Add To Cart</a><br></button>

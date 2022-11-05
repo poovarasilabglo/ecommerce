@@ -7,7 +7,7 @@
 {% for y in x.product_name.all %}
     <img class="card-img-top" src="{{y.products.img.url}}" alt="{{y.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
-    <h5 class="card-title">Name : {{y.products.name_of_product}}</h5>
+    <h4 class="card-title">Name : {{y.products.name_of_product}}</h4>
     <p>Quantity : {{y.quantity}}</p>
     <p class="card-text">Price : {{y.price}}</p>
     <p>product_price : RS {{y.get_total_products_price}}</p>

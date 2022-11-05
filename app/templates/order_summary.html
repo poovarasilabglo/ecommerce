@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if orders_product.order_status == 2 %}
+{% if orders_product.order_status == 1 %}
 <h2 style = "color:blue"> Order Summary</h2>
 <div class="card" style="width: 18rem; border:3px ">   
 {% for x in order_obj %}
     <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
-    <h5 class="card-title">Name : {{x.products.name_of_product}}</h5>
+    <h4 class="card-title">Name : {{x.products.name_of_product}}</h4>
     <p>Quantity : {{x.quantity}}</p>
     <p class="card-text">Price : {{x.price}}</p>
     <p>product_price : RS {{x.get_total_products_price}}</p>

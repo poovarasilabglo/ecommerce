@@ -13,6 +13,12 @@ from django.db.models import Q,F
 from django.db.models import Sum
 from app.models import *
 from django.core import serializers
+import stripe
+from django.conf import settings
+
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 
@@ -75,15 +81,18 @@ class products_read(LoginRequiredMixin,  ListView):
         context['wish_product'] =l
         #print(context)
         return context 
-              
+
+
+
+# search product display in json format              
 class search_product_json(ListView):
     model = products  
     
     def render_to_response(self, context, **kwargs):
         product_qs = products.objects.all()
-        print(product_qs)
+        #print(product_qs)
         query = self.request.GET.get('query')
-        print(query)
+        #print(query)
         qs = product_qs.filter( Q(name_of_product__icontains=query) | Q(brand__icontains=query) )
         qs_json = serializers.serialize('json', qs, indent =4)
         return HttpResponse(qs_json, content_type='application/json')
@@ -123,11 +132,21 @@ def Add_qua(request,id):
 @login_required(redirect_field_name='/cartlist', login_url='/apps')
 def show_cart(request):
     cart_obj = Cart.objects.filter(is_active = False)
-    return render (request, 'add_card.html', {'cart_obj': cart_obj})
+    total = cart_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
+    tax = total * 0.1
+    subtotal = total + tax
+    print(subtotal)
+    key = settings.STRIPE_PUBLISHABLE_KEY
+    context = {
+        'cart_obj': cart_obj,
+        'total':subtotal, 
+        'key':key  
+        }
+    return render (request, 'add_card.html', context)
 
 
 
-#cartlist display json format
+#cartlist display in json format
 class cart_json(ListView):
     model = Cart 
     def render_to_response(self, context, **kwargs):
@@ -165,7 +184,8 @@ def order_view(request):
             'order_obj':order_obj,
             'Tax':tax,
             'total':subtotal
-        }  
+        }
+        stripe.PaymentIntent.create(amount= int(total), currency="usd", payment_method_types=["card"])  
         return render(request, 'order_summary.html', context)
     else:
         return HttpResponse("your not checkout products")
@@ -173,6 +193,7 @@ def order_view(request):
 
    
 #order history view 
+@login_required 
 def order_show(request):
     if request.method == "GET":
         orders_product = order.objects.latest('product_name__id')
@@ -190,7 +211,7 @@ def order_show(request):
     
  
 
-#order page display json
+#order page display in json formate
 class order_json(ListView):
     model = order  
     def get(self,request, *args, **kwargs):
@@ -211,11 +232,13 @@ def cancel_order(request,id):
         order_remove.save()
         return redirect('order_show')
 
+
 def Remove_single_order(request,id):
     single_remove = Cart.objects.get(id=id)
     single_remove.cart_status = 3
     single_remove.save()
     return redirect('order')
+    
     
 #wishlist add    
 def Add_Wishlist(request,id):
@@ -260,7 +283,7 @@ class wishlist_json(ListView):
 
  
  
- #total order history
+#total order history
 def My_order_allhistory(request):
      orders = order.objects.filter(user = request.user)
      return render (request, 'my_order.html', {'orders': orders})
@@ -271,12 +294,37 @@ def My_order_allhistory(request):
   
   
   
-  
-  
-  
-  
-  
-  
+'''import stripe
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.generic import TemplateView
+from django.views import View
+
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+class HomePageView(TemplateView):
+    template_name = "new.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['key'] = settings.STRIPE_PUBLISHABLE_KEY
+        return context
+
+
+def charge(request):
+    if request.method == "POST":
+        charge = stripe.charge.create(
+            amount = 500,
+            currency = "inr",
+            description = "Payment Gateway",
+            source = request.POST['stripeToken']
+        )'''
+
+
+
+    
   
 
   

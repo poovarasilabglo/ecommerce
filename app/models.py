@@ -53,7 +53,7 @@ class Cart(TimeStampedModel):
 class order(TimeStampedModel):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
     product_name = models.ManyToManyField(Cart)
-    order_status = models.IntegerField(default = 2,choices = ORDER_STATUS_CHOICES) 
+    order_status = models.IntegerField(default = 1,choices = ORDER_STATUS_CHOICES) 
     tax =  models.FloatField(default = 0.1)
     status = models.BooleanField(default = False)
  

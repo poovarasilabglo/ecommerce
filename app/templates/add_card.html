@@ -8,10 +8,10 @@
 {% for x in cart_obj %}
     <img class="card-img-top" src="{{x.products.img.url}}" alt="{{x.products.name_of_product}}" width =150px height = 150px>
     <div class="card-body">
-    <h5 class="card-title">Name : {{x.products.name_of_product}}</h5>
+    <h4 class="card-title">Name : {{x.products.name_of_product}}</h4>
     <p class="card-text">Price : {{x.price}}</p>
     <form method = "GET" action = "/qua/{{x.id}}">
-        <p>quantity<input type = "number" name = "quantity" value = "{{x.quantity}}"</p>
+        <p>quantity<input type = "number" name = "quantity" min = "1" value = "{{x.quantity}}"</p>
         <button type = "submit" >ADD</button>
         <p>Created_at : {{x.created_at}}</p>
         </form>
@@ -22,13 +22,19 @@
         </form>
         </div>
       </div>
+      {% endfor %}
 
-{% endfor %}
 </div><br><br>
 <center>
-<form action = "{% url 'order' %}" method = 'POST'>
- {% csrf_token %}
-<button type = "submit"  style = "background-color:green">checkout</button>
+<form action="{% url 'order' %}" method="post">
+    {% csrf_token %}
+<script src = "https://checkout.stripe.com/checkout.js" class = "stripe-button"
+data-key="{{key}}"
+data-description="payment Gateway"
+data-currency = "inr"
+data-amount='{{total}}'
+data-locale="auto">
+</script>
 </form>
-</center>
+
 {% endblock %}
