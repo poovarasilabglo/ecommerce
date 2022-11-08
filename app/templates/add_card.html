@@ -23,9 +23,9 @@
         </div>
       </div>
       {% endfor %}
+      <h2 style = "color:blue">Total : {{total}} </h2>
 
 </div><br><br>
-<center>
 <form action="{% url 'order' %}" method="post">
     {% csrf_token %}
 <script src = "https://checkout.stripe.com/checkout.js" class = "stripe-button"
@@ -36,5 +36,7 @@ data-amount='{{total}}'
 data-locale="auto">
 </script>
 </form>
-
+<center><form action="{% url 'checkout' %}" method="get">
+<button type = "submit" style = "background-color:skyblue">checkout</button>
+</form></center>
 {% endblock %}

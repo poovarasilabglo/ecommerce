@@ -28,8 +28,10 @@ urlpatterns = [
            path('wish_js/',wishlist_json.as_view(), name='wish_js'),
            path('search_js/',search_product_json.as_view(), name='search_js'),
            #path('charge/',views.charge,name ='charge'),
-           #path('home/',HomePageView.as_view(), name = 'home')
-
+           path('checkout/',create_checkout_sessionview.as_view(), name = 'checkout'),
+           path('success/',Successview.as_view(),name = 'success'),
+           path('cancel/',Cancelview.as_view,name = 'cancel'),
+           path('webhook/',views.webhook_endpoint,name = 'webhook'),
     ]
 
 

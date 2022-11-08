@@ -15,10 +15,13 @@ from app.models import *
 from django.core import serializers
 import stripe
 from django.conf import settings
-
+from django.views.decorators.csrf import csrf_exempt
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+
+
 
 
 
@@ -146,6 +149,7 @@ def show_cart(request):
 
 
 
+    
 #cartlist display in json format
 class cart_json(ListView):
     model = Cart 
@@ -185,7 +189,8 @@ def order_view(request):
             'Tax':tax,
             'total':subtotal
         }
-        stripe.PaymentIntent.create(amount= int(total), currency="usd", payment_method_types=["card"])  
+        #a =stripe.PaymentIntent.create(amount= int(total), currency="usd", payment_method_types=["card"])  
+        #print(a)
         return render(request, 'order_summary.html', context)
     else:
         return HttpResponse("your not checkout products")
@@ -290,9 +295,51 @@ def My_order_allhistory(request):
 
 
 
+class create_checkout_sessionview(View):
+    def get(self, *args, **kwargs):
+        cart_obj = Cart.objects.filter(is_active = False)
+        total = cart_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
+        tax = total * 0.1
+        subtotal = total + tax
+        cart_obj.update(is_active = True)
+        YOUR_DOMAIN = "http://127.0.0.1:8000/"
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types = ['card'],
+            line_items =[
+                {
+                    'price_data': {
+                        'currency': 'inr',
+                        'unit_amount': int(subtotal),
+                        'product_data' : {
+                            'name': 'products',
+                         },
+                     },
+                     'quantity' : 1,
+                 },
+             ],
+             mode = 'payment',
+             success_url= YOUR_DOMAIN + '/success/',
+             cancel_url= YOUR_DOMAIN + '/cancel/',
+            
+        ) 
+        print(checkout_session)
+        return redirect(checkout_session.url)
   
-  
-  
+
+class Successview(TemplateView):
+    template_name = "success.html"
+      
+class Cancelview(TemplateView):
+    template_name = "cancel.html"
+
+
+@csrf_exempt
+def webhook_endpoint(request):
+    webhook_end = request.body.decode('utf-8')
+    print(webhook_end)
+    return HttpResponse(status=200)
+   
+
   
 '''import stripe
 from django.conf import settings
