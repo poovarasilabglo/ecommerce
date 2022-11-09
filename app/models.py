@@ -62,4 +62,18 @@ class order(TimeStampedModel):
 class Wishlist(TimeStampedModel):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
     product = models.ForeignKey(products, on_delete = models.CASCADE)
+
+
+class payment(TimeStampedModel):
+    paid_user = models.ForeignKey(order, on_delete = models.CASCADE)
+    transaction_id = models.TextField(max_length=200)
+    paid_status =  models.IntegerField(default = 2,choices = ORDER_STATUS_CHOICES)
+    amount = models.IntegerField()
+    email = models.EmailField()
+  
+    
+
+
+
+
    

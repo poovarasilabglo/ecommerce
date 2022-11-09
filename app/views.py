@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render,redirect,HttpResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from app.form import RegisterForm
 from django.views.generic.edit import CreateView
 from django.views.generic.list import ListView
@@ -16,7 +17,7 @@ from django.core import serializers
 import stripe
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
+import json
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -295,35 +296,41 @@ def My_order_allhistory(request):
 
 
 
-class create_checkout_sessionview(View):
-    def get(self, *args, **kwargs):
-        cart_obj = Cart.objects.filter(is_active = False)
-        total = cart_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
-        tax = total * 0.1
-        subtotal = total + tax
-        cart_obj.update(is_active = True)
-        YOUR_DOMAIN = "http://127.0.0.1:8000/"
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types = ['card'],
-            line_items =[
-                {
-                    'price_data': {
-                        'currency': 'inr',
-                        'unit_amount': int(subtotal),
-                        'product_data' : {
-                            'name': 'products',
-                         },
+def create_checkout_sessionview(request):
+    '''carts = Cart.objects.filter(Q(user = request.user) & Q(is_active = False))
+    created = order.objects.create(user = request.user)
+    created.product_name.add(*carts)
+    carts.update(is_active = True)'''
+
+    orders_product = order.objects.latest('product_name__id')
+    order_obj = orders_product.product_name.all()
+    total = order_obj.aggregate(total = Sum(F('price') * F('quantity')))['total']
+    tax = total * orders_product.tax
+    subtotal = total + tax
+    YOUR_DOMAIN = "http://127.0.0.1:8000/"
+    checkout_session = stripe.checkout.Session.create(
+        payment_method_types = ['card'],
+        line_items =[
+            {
+                'price_data': {
+                    'currency': 'inr',
+                    'unit_amount': int(subtotal),
+                    'product_data' : {
+                        'name': 'products',
                      },
-                     'quantity' : 1,
                  },
+                    'quantity' : 1,
+                },
              ],
+             metadata ={'order_id':orders_product.id},
              mode = 'payment',
              success_url= YOUR_DOMAIN + '/success/',
              cancel_url= YOUR_DOMAIN + '/cancel/',
-            
+
         ) 
-        print(checkout_session)
-        return redirect(checkout_session.url)
+    print(checkout_session)
+    payment.objects.create(transaction_id = checkout_session["id"],email = "sample@gmail.com", amount = 0, paid_status = False, paid_user_id = orders_product.id)
+    return redirect(checkout_session.url)
   
 
 class Successview(TemplateView):
@@ -335,47 +342,33 @@ class Cancelview(TemplateView):
 
 @csrf_exempt
 def webhook_endpoint(request):
-    webhook_end = request.body.decode('utf-8')
-    print(webhook_end)
-    return HttpResponse(status=200)
-   
-
-  
-'''import stripe
-from django.conf import settings
-from django.http import JsonResponse
-from django.views.generic import TemplateView
-from django.views import View
-
-
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
-
-class HomePageView(TemplateView):
-    template_name = "new.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['key'] = settings.STRIPE_PUBLISHABLE_KEY
-        return context
-
-
-def charge(request):
-    if request.method == "POST":
-        charge = stripe.charge.create(
-            amount = 500,
-            currency = "inr",
-            description = "Payment Gateway",
-            source = request.POST['stripeToken']
-        )'''
-
-
-
+    payload = request.body.decode('utf-8')
+    print(payload)
+    dict_obj = json.loads(payload)
+    print(dict_obj['type'])
     
-  
+    
+    if dict_obj['type'] == "checkout.session.completed":
+        session = dict_obj['data']['object']
+        print('*****************************',session)
+        sessionID = session["id"]
+        print(sessionID)
+        customer_email = session["customer_details"]["email"]
+        print(customer_email)
+        total = session["amount_total"] 
+        print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@',total)
+        order_id = session["metadata"]["order_id"]
+        print('444444444444444444444444444444444',order_id)
+      
+        payment.objects.filter(transaction_id = sessionID).update(email = customer_email, amount = total, paid_status = 1, paid_user_id =order_id)
+        #a= payment.objects.create(transaction_id = sessionID,email = customer_email, amount = total, paid_status = True, place_order_id =order_id)
+        return HttpResponse(status=200)
+    elif dict_obj['type'] ==  "charge.failed":
+         session = dict_obj['data']['object']
+         sessionID = session["id"]
+         customer_email = session["billing_details"]["email"]
+         total = session["amount"] 
+         return HttpResponse(status=200)
 
-  
-  
-  
- 
-       
+
+

@@ -4,6 +4,7 @@ from app.models import products
 from app.models import Cart
 from app.models import order
 from app.models import Wishlist
+from app.models import payment
 
 
 
@@ -47,3 +48,10 @@ class Wishlistadmin(admin.ModelAdmin):
     list_display = ('user','created_at')
 
 admin.site.register(Wishlist,Wishlistadmin)   
+
+
+class paymentadmin(admin.ModelAdmin):
+    list_display = ('transaction_id', 'email', 'amount', 'paid_status',)
+
+admin.site.register(payment,paymentadmin)   
+
